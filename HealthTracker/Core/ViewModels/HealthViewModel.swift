@@ -33,7 +33,7 @@ class HealthViewModel: ObservableObject {
     // İzin İste
     func requestPermission() async {
         do{
-            try await healthKitService.requestPermission()
+            try await healthKitService.requestAuthorization()
             isAuthorized = true
             await fetchAllData()
         } catch{
