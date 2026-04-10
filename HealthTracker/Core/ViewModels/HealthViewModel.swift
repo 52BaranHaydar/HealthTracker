@@ -17,78 +17,62 @@ class HealthViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published var isAuthorized: Bool = false
+    @Published var savedMetrics: [HealthMetric] = []
     
     private let healthKitService = HealthKitService.shared
+    private let databaseService = DatabaseService.shared
     
     init() {
-        Task {
-            await requestPermissions()
-        }
-    }
-    
-    func requestPermissions() async {
-        #if targetEnvironment(simulator)
-        // Simulator'da mock data kullan
-        loadMockData()
-        isAuthorized = true
-        #else
-        // Gerçek cihazda HealthKit kullan
-        do {
-            try await healthKitService.requestAuthorization()
-            isAuthorized = true
-            await fetchAllData()
-        } catch {
-            errorMessage = error.localizedDescription
+        print("🚀 HealthViewModel init çalıştı")
             loadMockData()
-        }
-        #endif
+            isAuthorized = true
+            Task {
+                print("📦 Task başladı")
+                await syncToFirebase()
+                await loadFromFirebase()
+            }
     }
     
-    func fetchAllData() async {
-        #if targetEnvironment(simulator)
-        loadMockData()
-        #else
-        isLoading = true
-        errorMessage = nil
-        
-        async let stepsResult = healthKitService.fetchSteps(for: Date())
-        async let heartRateResult = healthKitService.fetchHeartRate()
-        async let caloriesResult = healthKitService.fetchCalories()
-        
-        do {
-            let (s, h, c) = try await (stepsResult, heartRateResult, caloriesResult)
-            steps = s
-            heartRate = h
-            calories = c
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        
-        isLoading = false
-        #endif
-    }
-    
-    // MARK: - Mock Data (Simulator için)
+    // MARK: - Mock Data
     private func loadMockData() {
         steps = 7432
         heartRate = 72
         calories = 380
     }
     
-    // MARK: - Formatted Values
-    var stepsFormatted: String {
-        String(format: "%.0f", steps)
+    // MARK: - Firebase'e Kaydet
+    func syncToFirebase() async {
+        print("🔥 syncToFirebase çağrıldı - steps: \(steps)")
+            await databaseService.saveDailyMetrics(
+                steps: steps,
+                heartRate: heartRate,
+                calories: calories
+            )
+            print("✅ Firebase'e senkronize edildi")
     }
     
-    var heartRateFormatted: String {
-        heartRate == 0 ? "-- BPM" : String(format: "%.0f BPM", heartRate)
+    // MARK: - Firebase'den Yükle
+    func loadFromFirebase() async {
+        isLoading = true
+        do {
+            savedMetrics = try await databaseService.fetchMetrics()
+            print("✅ \(savedMetrics.count) kayıt yüklendi")
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
     
-    var caloriesFormatted: String {
-        String(format: "%.0f kcal", calories)
+    // MARK: - Verileri Yenile
+    func fetchAllData() async {
+        loadMockData()
+        await syncToFirebase()
+        await loadFromFirebase()
     }
     
-    var stepsProgress: Double {
-        min(steps / 10000, 1.0)
-    }
+    // MARK: - Formatted
+    var stepsFormatted: String { String(format: "%.0f", steps) }
+    var heartRateFormatted: String { String(format: "%.0f BPM", heartRate) }
+    var caloriesFormatted: String { String(format: "%.0f kcal", calories) }
+    var stepsProgress: Double { min(steps / 10000, 1.0) }
 }

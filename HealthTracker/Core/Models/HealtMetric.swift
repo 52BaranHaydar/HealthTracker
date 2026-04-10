@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct HealtMetric: Identifiable, Codable {
+struct HealthMetric: Identifiable, Codable {
     let id: UUID
     let type: MetricType
     let value: Double
     let unit: String
     let date: Date
     
-    init(id: UUID, type: MetricType, value: Double, unit: String, date: Date) {
+    init(id: UUID = UUID(), type: MetricType, value: Double, unit: String, date: Date = Date()) {
         self.id = id
         self.type = type
         self.value = value
@@ -22,7 +22,8 @@ struct HealtMetric: Identifiable, Codable {
         self.date = date
     }
 }
-enum MetricType: String, Codable, CaseIterable{
+
+enum MetricType: String, Codable, CaseIterable {
     case steps = "Adım"
     case heartRate = "Kalp Atışı"
     case calories = "Kalori"
