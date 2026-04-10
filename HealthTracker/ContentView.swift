@@ -10,7 +10,23 @@ struct ContentView: View {
     @EnvironmentObject var viewModel: HealthViewModel
     
     var body: some View {
-        DashboardView()
+        TabView {
+            DashboardView()
+                .tabItem {
+                    Label("Ana Sayfa", systemImage: "heart.fill")
+                }
+            
+            StepsView()
+                .tabItem {
+                    Label("Adımlar", systemImage: "figure.walk")
+                }
+            
+            HeartRateView()
+                .tabItem {
+                    Label("Kalp", systemImage: "waveform.path.ecg")
+                }
+        }
+        .tint(.blue)
     }
 }
 
@@ -18,3 +34,4 @@ struct ContentView: View {
     ContentView()
         .environmentObject(HealthViewModel())
 }
+
