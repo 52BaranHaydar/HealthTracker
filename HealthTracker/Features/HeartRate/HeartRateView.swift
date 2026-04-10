@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Charts
 
 struct HeartRateView: View {
     @EnvironmentObject var viewModel: HealthViewModel
+    @StateObject private var heartRateViewModel = HeartRateViewModel()
     @State private var isAnimating = false
     
     var body: some View {
@@ -64,6 +66,65 @@ struct HeartRateView: View {
                     .cornerRadius(12)
                     .padding(.horizontal)
                     
+                    // MARK: - Günlük Grafik
+                    HeartRateChart(entries: heartRateViewModel.hourlyHeartRates)
+                        .padding(.horizontal)
+                    
+                    // MARK: - İstatistikler
+                    HStack(spacing: 16) {
+                        VStack(spacing: 4) {
+                            Text("Min")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(heartRateViewModel.minFormatted)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.blue)
+                            Text("BPM")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                        
+                        VStack(spacing: 4) {
+                            Text("Ortalama")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(heartRateViewModel.averageFormatted)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.green)
+                            Text("BPM")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                        
+                        VStack(spacing: 4) {
+                            Text("Max")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(heartRateViewModel.maxFormatted)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.red)
+                            Text("BPM")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal)
+                    
                     // MARK: - Normal Aralık Bilgisi
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Normal Aralıklar")
@@ -77,6 +138,7 @@ struct HeartRateView: View {
                         }
                         .padding(.horizontal)
                     }
+                    .padding(.bottom, 20)
                 }
             }
             .navigationTitle("Kalp Atışı")

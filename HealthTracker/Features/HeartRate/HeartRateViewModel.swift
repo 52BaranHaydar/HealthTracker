@@ -40,7 +40,7 @@ class HeartRateViewModel: ObservableObject {
         String(format: "%.0f", maxHeartRate)
     }
     
-    var avarageFormatted: String {
+    var averageFormatted: String {
         String(format: "%.0f", averageHeartRate)
     }
     
