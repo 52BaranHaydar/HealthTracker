@@ -25,6 +25,13 @@ struct ContentView: View {
                 .tabItem {
                     Label("Kalp", systemImage: "waveform.path.ecg")
                 }
+            
+            WaterView()
+                .tabItem {
+                    Label("Su", systemImage: "drop.fill")
+                }
+            
+            
         }
         .tint(.blue)
     }
