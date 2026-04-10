@@ -11,7 +11,6 @@ import Combine
 @MainActor
 class HealthViewModel: ObservableObject {
     
-    // Published Properties
     @Published var steps: Double = 0
     @Published var heartRate: Double = 0
     @Published var calories: Double = 0
@@ -19,30 +18,36 @@ class HealthViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var isAuthorized: Bool = false
     
-    // Service
+    private let healthKitService = HealthKitService.shared
     
-    private let healthKitService =  HealthKitService.shared
-    
-    // Init
-    init(){
-        Task{
-            await requestPermission()
+    init() {
+        Task {
+            await requestPermissions()
         }
     }
     
-    // İzin İste
-    func requestPermission() async {
-        do{
+    func requestPermissions() async {
+        #if targetEnvironment(simulator)
+        // Simulator'da mock data kullan
+        loadMockData()
+        isAuthorized = true
+        #else
+        // Gerçek cihazda HealthKit kullan
+        do {
             try await healthKitService.requestAuthorization()
             isAuthorized = true
             await fetchAllData()
-        } catch{
+        } catch {
             errorMessage = error.localizedDescription
+            loadMockData()
         }
+        #endif
     }
     
-    // Tüm veriyi Çek
     func fetchAllData() async {
+        #if targetEnvironment(simulator)
+        loadMockData()
+        #else
         isLoading = true
         errorMessage = nil
         
@@ -50,8 +55,8 @@ class HealthViewModel: ObservableObject {
         async let heartRateResult = healthKitService.fetchHeartRate()
         async let caloriesResult = healthKitService.fetchCalories()
         
-        do{
-            let (s,h,c) = try await (stepsResult, heartRateResult, caloriesResult)
+        do {
+            let (s, h, c) = try await (stepsResult, heartRateResult, caloriesResult)
             steps = s
             heartRate = h
             calories = c
@@ -60,27 +65,30 @@ class HealthViewModel: ObservableObject {
         }
         
         isLoading = false
+        #endif
     }
     
+    // MARK: - Mock Data (Simulator için)
+    private func loadMockData() {
+        steps = 7432
+        heartRate = 72
+        calories = 380
+    }
+    
+    // MARK: - Formatted Values
     var stepsFormatted: String {
         String(format: "%.0f", steps)
     }
     
     var heartRateFormatted: String {
-        String(format: "%.0f BPM", heartRate)
+        heartRate == 0 ? "-- BPM" : String(format: "%.0f BPM", heartRate)
     }
     
     var caloriesFormatted: String {
         String(format: "%.0f kcal", calories)
     }
     
-    // Progres (hedef: 10.000 adım)
-    
     var stepsProgress: Double {
         min(steps / 10000, 1.0)
     }
-    
-    
-    
-    
 }
