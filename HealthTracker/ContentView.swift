@@ -30,7 +30,10 @@ struct ContentView: View {
                 .tabItem {
                     Label("Su", systemImage: "drop.fill")
                 }
-            
+            ProfileView()
+                .tabItem {
+                    Label("Profil", systemImage: "person.fill")
+                }
             
         }
         .tint(.blue)
