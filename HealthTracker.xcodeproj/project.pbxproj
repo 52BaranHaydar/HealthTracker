@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		95CF61E92F88DEDC00041CBA /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 95CF61E82F88DEDC00041CBA /* FirebaseAuth */; };
 		95CF61EB2F88DEDC00041CBA /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 95CF61EA2F88DEDC00041CBA /* FirebaseFirestore */; };
+		95CF62002F8B7F4600041CBA /* HealthTrackerModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 95CF61FE2F8B7F4600041CBA /* HealthTrackerModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		95769C092F88288F00EFEB78 /* HealthTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		95CF61FF2F8B7F4600041CBA /* HealthTrackerModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HealthTrackerModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,6 +54,7 @@
 		95769C002F88288F00EFEB78 = {
 			isa = PBXGroup;
 			children = (
+				95CF61FE2F8B7F4600041CBA /* HealthTrackerModel.xcdatamodeld */,
 				95769C0B2F88288F00EFEB78 /* HealthTracker */,
 				95769C0A2F88288F00EFEB78 /* Products */,
 			);
@@ -144,6 +147,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				95CF62002F8B7F4600041CBA /* HealthTrackerModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,6 +393,19 @@
 			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		95CF61FE2F8B7F4600041CBA /* HealthTrackerModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				95CF61FF2F8B7F4600041CBA /* HealthTrackerModel.xcdatamodel */,
+			);
+			currentVersion = 95CF61FF2F8B7F4600041CBA /* HealthTrackerModel.xcdatamodel */;
+			path = HealthTrackerModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 95769C012F88288F00EFEB78 /* Project object */;
 }
