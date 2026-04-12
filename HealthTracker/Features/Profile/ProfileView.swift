@@ -52,10 +52,8 @@ struct ProfileView: View {
                                     .font(.subheadline)
                                     .foregroundColor(bmiColor)
                             }
-                            
                             Divider()
                                 .frame(height: 60)
-                            
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("İdeal Kilo")
                                     .font(.caption)
@@ -67,7 +65,6 @@ struct ProfileView: View {
                             Spacer()
                         }
                         
-                        // BMI Göstergesi
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
                                 RoundedRectangle(cornerRadius: 4)
@@ -79,7 +76,6 @@ struct ProfileView: View {
                                         )
                                     )
                                     .frame(height: 8)
-                                
                                 Circle()
                                     .fill(.white)
                                     .frame(width: 16, height: 16)
@@ -116,7 +112,11 @@ struct ProfileView: View {
                         Text("Kişisel Bilgiler")
                             .font(.headline)
                         
-                        ProfileRow(title: "Ad Soyad", value: $profileViewModel.name, isEditing: isEditing)
+                        ProfileRow(
+                            title: "Ad Soyad",
+                            value: $profileViewModel.name,
+                            isEditing: isEditing
+                        )
                         
                         HStack {
                             Text("Yaş")
@@ -199,6 +199,63 @@ struct ProfileView: View {
                             icon: "flame.fill",
                             color: .orange,
                             isEditing: isEditing
+                        )
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(16)
+                    .shadow(color: .gray.opacity(0.1), radius: 8, x: 0, y: 4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
+                    )
+                    .padding(.horizontal)
+                    
+                    // MARK: - Bildirim Ayarları
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Bildirim Ayarları")
+                            .font(.headline)
+                        
+                        NotificationToggleRow(
+                            title: "Su Hatırlatıcısı",
+                            subtitle: "Her 2 saatte bir hatırlat",
+                            icon: "drop.fill",
+                            color: .cyan,
+                            action: {
+                                Task {
+                                    try? await NotificationService.shared.requestAuthorization()
+                                    NotificationService.shared.scheduleWaterReminders()
+                                }
+                            }
+                        )
+                        
+                        NotificationToggleRow(
+                            title: "Adım Hatırlatıcısı",
+                            subtitle: "Her gün 19:00'da hatırlat",
+                            icon: "figure.walk",
+                            color: .blue,
+                            action: {
+                                Task {
+                                    try? await NotificationService.shared.requestAuthorization()
+                                    NotificationService.shared.scheduleStepReminder(
+                                        currentSteps: 0,
+                                        goal: 10000
+                                    )
+                                }
+                            }
+                        )
+                        
+                        NotificationToggleRow(
+                            title: "Günlük Özet",
+                            subtitle: "Her gün 21:00'da özet gönder",
+                            icon: "chart.bar.fill",
+                            color: .purple,
+                            action: {
+                                Task {
+                                    try? await NotificationService.shared.requestAuthorization()
+                                    NotificationService.shared.scheduleDailySummary()
+                                }
+                            }
                         )
                     }
                     .padding()
@@ -345,6 +402,49 @@ struct GoalRow: View {
                 Slider(value: $value, in: range, step: step)
                     .tint(color)
             }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
+}
+
+// MARK: - Notification Toggle Row
+struct NotificationToggleRow: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    @State private var isEnabled = false
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(color)
+                .frame(width: 32)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Toggle("", isOn: $isEnabled)
+                .tint(color)
+                .onChange(of: isEnabled) { _, newValue in
+                    if newValue {
+                        action()
+                    } else {
+                        NotificationService.shared.cancelAllNotifications()
+                    }
+                }
         }
         .padding()
         .background(Color(.systemGray6))
